@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- =====================================================
 -- TABELLA: nations (58 NAZIONI) - Skip se esiste
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS nations (
+CREATE TABLE IF NOT EXISTS nations (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     color TEXT NOT NULL DEFAULT '#3B82F6',
@@ -361,7 +361,7 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================
 -- TABELLA: game_turns (SNAPSHOT PER TURNO)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_turns (
+CREATE TABLE IF NOT EXISTS game_turns (
     turn_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nation_id TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
     turn_number INT NOT NULL,
@@ -379,7 +379,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_turns (
 -- =====================================================
 -- TABELLA: relations (RELAZIONI BILATERALI)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS relations (
+CREATE TABLE IF NOT EXISTS relations (
     nation_a TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
     nation_b TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
     value INT CHECK (value BETWEEN -100 AND 100) DEFAULT 0,
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS relations (
 -- =====================================================
 -- TABELLA: game_events (EVENT LOG)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_events (
+CREATE TABLE IF NOT EXISTS game_events (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     turn_id BIGINT REFERENCES game_turns(turn_id) ON DELETE CASCADE,
     nation_id TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
@@ -409,7 +409,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_events (
 -- =====================================================
 -- TABELLA: action_queue (AZIONI PENDENTI)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS action_queue (
+CREATE TABLE IF NOT EXISTS action_queue (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     turn_id BIGINT REFERENCES game_turns(turn_id) ON DELETE CASCADE,
     nation_id TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
@@ -426,7 +426,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS action_queue (
 -- =====================================================
 -- TABELLA: consequences (EFFETTI DELAYED)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS consequences (
+CREATE TABLE IF NOT EXISTS consequences (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     turn_id BIGINT NOT NULL REFERENCES game_turns(turn_id) ON DELETE CASCADE,
     nation_id TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
@@ -441,7 +441,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS consequences (
 -- =====================================================
 -- TABELLA: game_sessions (MULTIPLAYER)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_sessions (
+CREATE TABLE IF NOT EXISTS game_sessions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL DEFAULT 'Nuova Partita',
     status TEXT DEFAULT 'waiting' CHECK (status IN ('waiting', 'active', 'paused', 'finished')),
@@ -456,7 +456,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS game_sessions (
 -- =====================================================
 -- TABELLA: ai_turns (TURNI AI)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS ai_turns (
+CREATE TABLE IF NOT EXISTS ai_turns (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     session_id UUID REFERENCES game_sessions(id) ON DELETE CASCADE,
     nation_id TEXT NOT NULL REFERENCES nations(id) ON DELETE CASCADE,
@@ -468,7 +468,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS ai_turns (
 -- =====================================================
 -- TABELLA: config (CONFIGURAZIONE)
 -- =====================================================
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS config (
+CREATE TABLE IF NOT EXISTS config (
     key TEXT PRIMARY KEY,
     value JSONB NOT NULL,
     description TEXT,
