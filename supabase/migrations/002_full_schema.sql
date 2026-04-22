@@ -525,11 +525,5 @@ WHERE n1.id < n2.id
 ON CONFLICT (nation_a, nation_b) DO NOTHING;
 
 -- =====================================================
--- Create system event for game start
+-- Create system event for game start - skip (richiede turn_id)
 -- =====================================================
-INSERT INTO game_events (nation_id, type, title, description, severity)
-SELECT n.id, 'system', 'Partita Iniziata', 'La simulazione geopolitica è iniziata con ' || 58 || ' nazioni. Buona fortuna!', 'positive'
-FROM nations n
-WHERE NOT EXISTS (
-    SELECT 1 FROM game_events e WHERE e.nation_id = n.id AND e.title = 'Partita Iniziata'
-);
