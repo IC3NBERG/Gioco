@@ -496,12 +496,7 @@ ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_turns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consequences ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "public_read_nations" ON nations FOR SELECT USING (true);
-CREATE POLICY "public_read_turns" ON game_turns FOR SELECT USING (true);
-CREATE POLICY "public_read_relations" ON relations FOR SELECT USING (true);
-CREATE POLICY "public_read_events" ON game_events FOR SELECT USING (true);
-CREATE POLICY "public_read_config" ON config FOR SELECT USING (true);
-CREATE POLICY "public_read_sessions" ON game_sessions FOR SELECT USING (true);
+-- RLS Policies - skip (già creati in 001)
 
 -- =====================================================
 -- Create initial turns for all 58 nations (turn 0)
