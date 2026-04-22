@@ -71,7 +71,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set({ designDirection: dir });
   },
-  designDirection: 'A',
   pendingActions: [],
 
   initSupabase: (url: string, anonKey: string) => {
