@@ -1,0 +1,13 @@
+name = "geopolitica-avanzata"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./dist"
+
+[build]
+command = "npm run build"
+watch_dir = "src"
+
+[[observers]]
+name = "resolve-turn"
+description = "Edge function per risoluzione turni"
