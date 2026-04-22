@@ -19,24 +19,52 @@ const ResolveTurnRequest = z.object({
   })).max(PA_LIMIT),
 });
 
-const ActionEffects: Record<string, { relationDelta?: number; consensusDelta?: number; cost?: number; risk?: number }> = {
-  'trade_pact': { relationDelta: 5, cost: 0 },
-  'non_aggression': { relationDelta: 8, cost: 0 },
-  'economic_aid': { relationDelta: 10, consensusDelta: 2, cost: 50 },
-  'sanctions': { relationDelta: -15, consensusDelta: -2 },
-  'threat': { relationDelta: -10 },
-  'state_visit': { relationDelta: 3 },
-  'military_exercise': { relationDelta: -5, consensusDelta: 2 },
-  'diplomatic_warning': { relationDelta: -5 },
-  'media_campaign': { consensusDelta: 5 },
-  'policy_reform': { consensusDelta: 3 },
-  'budget_increase': { consensusDelta: 2, cost: 30 },
-  'budget_cut': { consensusDelta: -3, cost: -20 },
-  'technology_investment': { consensusDelta: 1 },
-  'space_program': { consensusDelta: 3, cost: 100 },
-  'military_ buildup': { consensusDelta: 2, cost: 80 },
-  'treaty_join': { relationDelta: 10 },
-  'treaty_leave': { relationDelta: -20 },
+const ActionEffects: Record<string, { relationDelta?: number; consensusDelta?: number; gdpDelta?: number; growthDelta?: number; inflationDelta?: number; stabilityDelta?: number; techDelta?: number; militaryDelta?: number; cost?: number; risk?: number }> = {
+  // DIPLOMAZIA - Trattati (top 20)
+  trattato_amico: { relationDelta: 35, consensusDelta: 5, cost: 40, risk: 0.15 },
+  trattato_commercio: { relationDelta: 25, gdpDelta: 3, cost: 35, risk: 0.15 },
+  trattato_non_aggressione: { relationDelta: 40, cost: 30, risk: 0.2 },
+  alleanza_difensiva: { relationDelta: 45, militaryDelta: 5, cost: 60, risk: 0.25 },
+  alleanza_offensiva: { relationDelta: 45, militaryDelta: 10, cost: 70, risk: 0.3 },
+  trattato_cultura: { relationDelta: 20, consensusDelta: 3, cost: 25, risk: 0.1 },
+  trattato_tecnologia: { techDelta: 5, cost: 45, risk: 0.15 },
+  trattato_scienza: { techDelta: 8, cost: 50, risk: 0.1 },
+  sanctions_economiche: { relationDelta: -35, gdpDelta: -3, cost: 30, risk: 0.25 },
+  relazione_summit: { relationDelta: 35, consensusDelta: 5, cost: 50, risk: 0.15 },
+  relazione_state_visit: { relationDelta: 45, consensusDelta: 5, cost: 70, risk: 0.15 },
+  
+  // ECONOMIA - Azioni principali
+  industria_pesante: { gdpDelta: 8, militaryDelta: 10, cost: 120, risk: 0.1 },
+  industria_leggera: { gdpDelta: 5, cost: 60, risk: 0.15 },
+  elettronica: { gdpDelta: 6, techDelta: 8, cost: 100, risk: 0.15 },
+  energia_nucleare: { gdpDelta: 4, cost: 150, risk: 0.05 },
+  energia_solare: { gdpDelta: 3, cost: 80, risk: 0.1 },
+  
+  // MILITARE
+  reclutamento: { militaryDelta: 15, cost: 30, risk: 0.15 },
+  leva_obbligatoria: { militaryDelta: 20, cost: 20, risk: 0.2 },
+  special_forces: { militaryDelta: 12, techDelta: 5, cost: 90, risk: 0.2 },
+  armi_nucleari: { militaryDelta: 25, techDelta: 15, cost: 200, risk: 0.3 },
+  
+  // POLITICA
+  costituzione: { consensusDelta: 10, stabilityDelta: 10, cost: 50, risk: 0.2 },
+  sanita_pubblica: { consensusDelta: 10, gdpDelta: 3, cost: 80, risk: 0.2 },
+  previdenza: { consensusDelta: 8, gdpDelta: 2, cost: 60, risk: 0.25 },
+  
+  // TECNOLOGIA
+  ricerca_base: { techDelta: 10, cost: 60, risk: 0.1 },
+  ricerca_universitaria: { techDelta: 15, cost: 70, risk: 0.1 },
+  spazio_1: { techDelta: 15, consensusDelta: 5, cost: 60, risk: 0.15 },
+  spazio_2: { techDelta: 10, cost: 70, risk: 0.3 },
+  spazio_7: { techDelta: 25, consensusDelta: 8, cost: 180, risk: 0.35 },
+  spazio_10: { techDelta: 50, consensusDelta: 20, cost: 400, risk: 0.6 },
+  
+  // CULTURA
+  istruzione_1: { techDelta: 8, consensusDelta: 5, cost: 40, risk: 0.1 },
+  istruzione_3: { techDelta: 15, cost: 80, risk: 0.15 },
+  
+  // Fallback per azioni non riconosciute
+  none: { cost: 0, risk: 0 },
 };
 
 function hashString(str: string): number {
@@ -89,14 +117,17 @@ function calcMacro(prevEconomy: Record<string, unknown>, actions: Array<{ action
   let totalSpending = 0;
   let inflationPressure = 0;
   let sectorInvest = 0;
+  let techInvest = 0;
 
   for (const action of actions) {
-    const effect = ActionEffects[action.action_type];
-    if (effect?.cost) totalSpending += effect.cost;
-    if (action.action_type.includes('budget') || action.action_type.includes('spending')) {
+    const effect = ActionEffects[action.action_type] || ActionEffects['none'];
+    if (effect.cost) totalSpending += effect.cost;
+    if (effect.gdpDelta) sectorInvest += effect.gdpDelta || 0;
+    if (effect.techDelta) techInvest += effect.techDelta || 0;
+    if (action.action_type.includes('budget') || action.action_type.includes('spesa')) {
       inflationPressure += seededRandom(`${seed}-${action.action_type}`, 0.1, 0.5);
     }
-    if (action.action_type.includes('investment') || action.action_type.includes('program')) {
+    if (action.action_type.includes('invest') || action.action_type.includes('program')) {
       sectorInvest += seededRandom(`${seed}-${action.action_type}`, 0.5, 2.0);
     }
   }

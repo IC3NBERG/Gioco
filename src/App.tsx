@@ -2,9 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useGameStore } from './store/gameStore';
 import { Dashboard } from './components/Dashboard';
 import { Globe3D } from './components/Globe3D';
+import { Map2D } from './components/Map2D';
 import { SpaceProgram } from './components/SpaceProgram';
-import type { GameEventDB } from './types';
+import { ChoiceBrowser } from './components/ChoiceBrowser';
+import { FactionOverview } from './components/FactionOverview';
+import { VictoryProgress } from './components/VictoryProgress';
+import type { GameEventDB, Choice } from './types';
 import { NATIONS_LIST } from './data/nations';
+import { executeChoice, checkVictory, skipTurn } from './services/turnExecutor';
+import { runFullTurn } from './services/aiExecutor';
+import GAME_CONFIG from './config/gameConfig';
 
 const EventFeed: React.FC<{ events: GameEventDB[] }> = ({ events }) => {
   const getSeverityColor = (severity: string) => {
@@ -58,7 +65,8 @@ const EventFeed: React.FC<{ events: GameEventDB[] }> = ({ events }) => {
   );
 };
 
-type TabType = 'dashboard' | 'space';
+type TabType = 'dashboard' | 'scelte' | 'fazioni' | 'vittoria' | 'space';
+type MapView = '3d' | '2d';
 
 const App: React.FC = () => {
   const { 
@@ -66,11 +74,20 @@ const App: React.FC = () => {
     events, 
     isLoading,
     setCurrentNation,
+    loadEvents,
   } = useGameStore();
 
   const [showFeed, setShowFeed] = useState(true);
   const [selectedNationId, setSelectedNationId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+  const [mapView, setMapView] = useState<MapView>('3d');
+  const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
+  const [executingChoice, setExecutingChoice] = useState(false);
+  const [turnNumber, setTurnNumber] = useState(1);
+  const [victoryState, setVictoryState] = useState<{ hasWon: boolean; hasLost: boolean; reason?: string } | null>(null);
+  const [paRemaining, setPaRemaining] = useState(GAME_CONFIG.PA_PER_TURN);
+
+  const nations = NATIONS_LIST;
 
   useEffect(() => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -85,9 +102,70 @@ const App: React.FC = () => {
   const handleSelectNation = async (nationId: string) => {
     setSelectedNationId(nationId);
     await setCurrentNation(nationId);
+    setPaRemaining(GAME_CONFIG.PA_PER_TURN);
+    setVictoryState(null);
   };
 
-  const nations = NATIONS_LIST;
+  const handleChoiceSelect = async (choice: Choice) => {
+    if (!currentNationId || executingChoice || paRemaining < choice.cost.pa) return;
+    
+    setSelectedChoice(choice);
+    setExecutingChoice(true);
+
+    try {
+      const result = await executeChoice(currentNationId, choice);
+      
+      if (result.success) {
+        console.log('Azione eseguita:', result);
+        setPaRemaining(prev => prev - choice.cost.pa);
+        await loadEvents(currentNationId);
+        
+        if (result.winLose) {
+          setVictoryState({ 
+            hasWon: result.winLose === 'win', 
+            hasLost: result.winLose === 'lose',
+            reason: result.winLose === 'win' ? 'Hai vinto!' : 'Hai perso!'
+          });
+        }
+      } else {
+        console.error('Errore azione:', result.error);
+      }
+    } catch (error) {
+      console.error('Execution error:', error);
+    } finally {
+      setExecutingChoice(false);
+    }
+  };
+
+  const handleEndTurn = async () => {
+    if (!currentNationId || executingChoice) return;
+    
+    setExecutingChoice(true);
+    try {
+      await skipTurn(currentNationId);
+      
+      const allNations = nations as any;
+      const result = await runFullTurn(
+        currentNationId,
+        allNations,
+        [],
+        turnNumber
+      );
+      
+      setTurnNumber(result.newTurn);
+      setPaRemaining(GAME_CONFIG.PA_PER_TURN);
+      await loadEvents(currentNationId);
+      
+      const victory = await checkVictory(currentNationId, turnNumber);
+      if (victory.hasWon || victory.hasLost) {
+        setVictoryState(victory);
+      }
+    } catch (error) {
+      console.error('End turn error:', error);
+    } finally {
+      setExecutingChoice(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -114,18 +192,42 @@ const App: React.FC = () => {
               ))}
             </select>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'dashboard' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
                 📊 Dashboard
               </button>
               <button
+                onClick={() => setActiveTab('scelte')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'scelte' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                ⚡ Scelte
+              </button>
+              <button
+                onClick={() => setActiveTab('fazioni')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'fazioni' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                🏛️ Fazioni
+              </button>
+              <button
+                onClick={() => setActiveTab('vittoria')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'vittoria' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                🏆 Vittoria
+              </button>
+              <button
                 onClick={() => setActiveTab('space')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === 'space' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
@@ -133,7 +235,7 @@ const App: React.FC = () => {
               </button>
               <button
                 onClick={() => setShowFeed(!showFeed)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   showFeed ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
@@ -152,24 +254,124 @@ const App: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-5 xl:col-span-4 h-[600px] bg-slate-900 rounded-lg border border-slate-800 overflow-hidden">
-              <Globe3D 
-                currentNationId={currentNationId}
-                selectedNationId={selectedNationId}
-                onSelectNation={handleSelectNation}
-              />
+            {/* MAP VIEW */}
+            <div className="lg:col-span-5 xl:col-span-4 h-[600px] bg-slate-900 rounded-lg border border-slate-800 overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between p-2 border-b border-slate-800">
+                <span className="text-sm text-slate-400 px-2">Mappa</span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setMapView('3d')}
+                    className={`px-2 py-1 rounded text-xs ${
+                      mapView === '3d' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'
+                    }`}
+                  >
+                    3D
+                  </button>
+                  <button
+                    onClick={() => setMapView('2d')}
+                    className={`px-2 py-1 rounded text-xs ${
+                      mapView === '2d' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300'
+                    }`}
+                  >
+                    2D
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1">
+                {mapView === '3d' ? (
+                  <Globe3D 
+                    currentNationId={currentNationId}
+                    selectedNationId={selectedNationId}
+                    onSelectNation={handleSelectNation}
+                  />
+                ) : (
+                  <Map2D 
+                    nations={nations as any}
+                    selectedNation={selectedNationId || currentNationId || undefined}
+                    onSelectNation={handleSelectNation}
+                  />
+                )}
+              </div>
             </div>
 
-            {activeTab === 'dashboard' ? (
-              <div className="lg:col-span-4 xl:col-span-5">
-                <Dashboard />
+            {/* MAIN CONTENT AREA */}
+            <div className="lg:col-span-4 xl:col-span-5">
+              {activeTab === 'dashboard' && <Dashboard />}
+              {activeTab === 'scelte' && (
+                <div className="h-[600px] overflow-hidden">
+                  <ChoiceBrowser 
+                    onSelectChoice={handleChoiceSelect} 
+                    selectedNation={currentNationId || undefined}
+                  />
+                </div>
+              )}
+              {activeTab === 'fazioni' && (
+                <div className="h-[600px] overflow-auto">
+                  <FactionOverview 
+                    factions={[
+                      { id: 'progressives', name: 'Progressisti', type: 'Progressive', baseApproval: 35, weight: 0.3, demands: {}, mobilization: 30, status: 'neutral' },
+                      { id: 'conservatives', name: 'Conservatori', type: 'Conservative', baseApproval: 30, weight: 0.25, demands: {}, mobilization: 25, status: 'neutral' },
+                      { id: 'nationalists', name: 'Nazionalisti', type: 'Nationalist', baseApproval: 20, weight: 0.2, demands: {}, mobilization: 20, status: 'neutral' },
+                      { id: 'globalists', name: 'Globalisti', type: 'Globalist', baseApproval: 15, weight: 0.15, demands: {}, mobilization: 15, status: 'neutral' },
+                      { id: 'technocrats', name: 'Tecnocrati', type: 'Technocratic', baseApproval: 25, weight: 0.2, demands: {}, mobilization: 25, status: 'neutral' },
+                    ]}
+                    currentNationId={currentNationId || undefined}
+                  />
+                </div>
+              )}
+              {activeTab === 'vittoria' && (
+                <VictoryProgress 
+                  nations={nations as any}
+                  currentNationId={currentNationId || ''}
+                  turnNumber={turnNumber}
+                />
+              )}
+              {activeTab === 'space' && <SpaceProgram />}
+              
+              {/* Turn Controls */}
+              <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-800">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <span className="text-slate-400 text-sm">Turno:</span>
+                    <span className="ml-2 text-xl font-bold">{turnNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 text-sm">PA:</span>
+                    <span className="ml-2 text-xl font-bold text-blue-400">{paRemaining}</span>
+                    <span className="text-slate-500">/{GAME_CONFIG.PA_PER_TURN}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleEndTurn}
+                  disabled={!currentNationId || executingChoice}
+                  className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+                    executingChoice || !currentNationId
+                      ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-500 text-white'
+                  }`}
+                >
+                  {executingChoice ? '⏳ Eseguendo...' : '▶️ Termina Turno (AI esegue)'}
+                </button>
               </div>
-            ) : (
-              <div className="lg:col-span-4 xl:col-span-5">
-                <SpaceProgram />
-              </div>
-            )}
+              
+              {/* Victory Alert */}
+              {victoryState && (
+                <div className={`mt-4 p-4 rounded-lg border ${
+                  victoryState.hasWon 
+                    ? 'bg-green-900/30 border-green-500' 
+                    : 'bg-red-900/30 border-red-500'
+                }`}>
+                  <span className={`text-lg font-bold ${
+                    victoryState.hasWon ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {victoryState.hasWon ? '🎉 VITTORIA!' : '💀 SCONFITTA!'}
+                  </span>
+                  <p className="text-slate-300">{victoryState.reason}</p>
+                </div>
+              )}
+            </div>
 
+            {/* EVENT FEED */}
             {showFeed && (
               <div className="lg:col-span-3">
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 h-[600px] overflow-hidden flex flex-col">
@@ -185,14 +387,14 @@ const App: React.FC = () => {
       <footer className="bg-slate-900 border-t border-slate-800 px-6 py-4 mt-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-sm text-slate-500">
           <div>
-            GEOPOLITICA AVANZATA v1.1.0 | Simulazione Geopolitica 3D
+            GEOPOLITICA AVANZATA v1.3.0 | Simulazione Geopolitica 3D
           </div>
           <div className="flex gap-4">
-            <span> Nazioni: {nations.length}</span>
+            <span>Nazioni: {nations.length}</span>
             <span>•</span>
-            <span>PA: 3/turno</span>
+            <span>PA: {GAME_CONFIG.PA_PER_TURN}/turno</span>
             <span>•</span>
-            <span>Vittoria: Consenso ≥80% o Luna liv.3</span>
+            <span>Vittoria: Consenso ≥{GAME_CONFIG.VICTORY_CONSENSUS_THRESHOLD}%</span>
           </div>
         </div>
       </footer>

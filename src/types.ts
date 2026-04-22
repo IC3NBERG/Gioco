@@ -266,10 +266,14 @@ export interface Faction {
   id: string;
   name: string;
   type: string;
-  base_approval: number;
+  baseApproval?: number;
+  base_approval?: number;
+  influence?: number;
   weight: number;
   demands?: Record<string, number>;
-  mobilization: number;
+  demandsList?: string[];
+  mobilization?: number;
+  status?: 'loyal' | 'neutral' | 'opposition' | 'hostile';
 }
 
 export interface TechProgress {
