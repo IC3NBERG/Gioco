@@ -1,6 +1,10 @@
-import type { Nation, Position, Leader } from '../types';
+import type { Nation, Position } from '../types';
 
-export const NATIONS_DATA: (Nation & { position: Position })[] = [
+interface NationWithPosition extends Nation {
+  position: Position;
+}
+
+export const NATIONS_DATA: NationWithPosition[] = [
   { id: 'afghanistan', name: 'Afghanistan', color: '#FF6B6B', flag_emoji: '🇦🇫', position: { lat: 33.9391, lng: 67.71 }, resources: { money: 500, oil: 10, steel: 5, food: 20 }, leader: { name: 'Hibatullah Akhundzada', personality: 'Aggressive', ideology: 'Nationalist' }, start_relations: { pakistan: -10, iran: 0, usa: -30, cina: 10 }, tech_tree: { launchers: { level: 0, progress: 0 }, satellites: { level: 0, progress: 0 }, stations: { level: 0, progress: 0 }, lunar: { level: 0, progress: 0 }, mars: { level: 0, progress: 0 } },
   { id: 'albania', name: 'Albania', color: '#E42E2E', flag_emoji: '🇦🇱', position: { lat: 41.1533, lng: 20.1689 }, resources: { money: 400, oil: 5, steel: 10, food: 25 }, leader: { name: 'Bajram Begaj', personality: 'Diplomatic', ideology: 'Pragmatic' }, start_relations: { italia: 15, usa: 10, grecia: 0, cina: 0 }, tech_tree: { launchers: { level: 0, progress: 0 }, satellites: { level: 0, progress: 0 }, stations: { level: 0, progress: 0 }, lunar: { level: 0, progress: 0 }, mars: { level: 0, progress: 0 } },
   { id: 'algeria', name: 'Algeria', color: '#006233', flag_emoji: '🇩🇿', position: { lat: 28.0339, lng: 1.6596 }, resources: { money: 600, oil: 100, steel: 20, food: 40 }, leader: { name: 'Abdelmadjid Tebboune', personality: 'Pragmatic', ideology: 'Nationalist' }, start_relations: { francia: -10, usa: 5, marocco: -5, italia: 5 }, tech_tree: { launchers: { level: 0, progress: 0 }, satellites: { level: 0, progress: 0 }, stations: { level: 0, progress: 0 }, lunar: { level: 0, progress: 0 }, mars: { level: 0, progress: 0 } },
