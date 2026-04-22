@@ -525,27 +525,6 @@ WHERE n1.id < n2.id
 ON CONFLICT (nation_a, nation_b) DO NOTHING;
 
 -- =====================================================
--- Update existing relations from start_relations
--- =====================================================
-UPDATE relations r
-SET value = COALESCE(
-    (SELECT CAST(start_relations->>n2.id AS INT)
-     FROM nations n1
-     WHERE n1.id = r.nation_a
-     AND n1.start_relations ? n2.id),
-    (SELECT CAST(n2.start_relations->>n1.id AS INT)
-     FROM nations n2
-     WHERE n2.id = r.nation_b
-     AND n2.start_relations ? n1.id),
-    0
-)
-WHERE EXISTS (
-    SELECT 1 FROM nations n1 WHERE n1.id = r.nation_a
-) AND EXISTS (
-    SELECT 1 FROM nations n2 WHERE n2.id = r.nation_b
-);
-
--- =====================================================
 -- Create system event for game start
 -- =====================================================
 INSERT INTO game_events (nation_id, type, title, description, severity)
