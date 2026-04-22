@@ -16,10 +16,14 @@ export interface GameEventData {
   severity: 'positive' | 'neutral' | 'negative' | 'critical';
 }
 
+export interface EventConditions {
+  minGdp?: number;
+  maxDebtGdp?: number;
+  minConsensus?: number;
+  techLevel?: string;
+}
+
 export const GAME_EVENTS: GameEventData[] = [
-  // ============================================
-  // DISASTRI NATURALI
-  // ============================================
   {
     id: 'earthquake',
     name: 'Terremoto Devastante',
@@ -94,14 +98,10 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'environment', value: -15, duration: 10 }
     ]
   },
-
-  // ============================================
-  // CRISI ECONOMICHE
-  // ============================================
   {
     id: 'recession',
     name: 'Recessione Economica',
-    description: 'L\'economia entra in recessione',
+    description: "L'economia entra in recessione",
     category: 'crisi',
     probability: 0.08,
     severity: 'negative',
@@ -126,7 +126,7 @@ export const GAME_EVENTS: GameEventData[] = [
   {
     id: 'inflation_spike',
     name: 'Inflazione Record',
-    description: 'L\'inflazione raggiunge livelli critici',
+    description: "L'inflazione raggiunge livelli critici",
     category: 'crisi',
     probability: 0.06,
     severity: 'negative',
@@ -172,10 +172,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'trade', value: -20, duration: 8 }
     ]
   },
-
-  // ============================================
-  // CRISI POLITICHE
-  // ============================================
   {
     id: 'coup',
     name: 'Colpo di Stato',
@@ -224,10 +220,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'economy', value: -10, duration: 4 }
     ]
   },
-
-  // ============================================
-  // SCOPERTE
-  // ============================================
   {
     id: 'oil_discovery',
     name: 'Scoperta Petrolifera',
@@ -288,10 +280,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'economy', value: 8, duration: 6 }
     ]
   },
-
-  // ============================================
-  // EVENTI DIPLOMATICI
-  // ============================================
   {
     id: 'alliance_offer',
     name: 'Offerta di Alleanza',
@@ -364,10 +352,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'reputation', value: 10, duration: 5 }
     ]
   },
-
-  // ============================================
-  // EVENTI SPAZIALI
-  // ============================================
   {
     id: 'satellite_launch',
     name: 'Lancio Satellitare',
@@ -420,10 +404,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'reputation', value: 50, duration: 25 }
     ]
   },
-
-  // ============================================
-  // EVENTI MILITARI
-  // ============================================
   {
     id: 'military_coup',
     name: 'Golpe Militare',
@@ -474,10 +454,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'military', value: 15, duration: 5 }
     ]
   },
-
-  // ============================================
-  // EVENTI INTERNI
-  // ============================================
   {
     id: 'election_win',
     name: 'Vittoria Elettorale',
@@ -598,10 +574,6 @@ export const GAME_EVENTS: GameEventData[] = [
       { type: 'immediate', target: 'reputation', value: 5, duration: 4 }
     ]
   },
-
-  // ============================================
-  // EVENTI UNICI
-  // ============================================
   {
     id: 'golden_age',
     name: 'Età dell\'Oro',
@@ -647,7 +619,7 @@ export const GAME_EVENTS: GameEventData[] = [
   {
     id: 'economic_miracle',
     name: 'Miracolo Economico',
-    description: 'L\'economia cresce a ritmi record',
+    description: "L'economia cresce a ritmi record",
     category: 'unico',
     probability: 0.03,
     severity: 'positive',
@@ -671,25 +643,36 @@ export const GAME_EVENTS: GameEventData[] = [
   }
 ];
 
-export function getRandomEvent(turnNumber: number, conditions?: {
-  minGdp?: number;
-  maxDebtGdp?: number;
-  minConsensus?: number;
-  techLevel?: string;
-}): GameEventData | null {
-  const eligible = GAME_EVENTS.filter(event => {
-    if (event.requirements?.minTurn && turnNumber < event.requirements.minTurn) return false;
-    if (event.requirements?.economy?.minGdp && conditions && (conditions.minGdp || 0) < event.requirements.economy.minGdp) return false;
-    if (event.requirements?.economy?.maxDebtGdp && conditions && (conditions.maxDebtGdp || 0) > event.requirements.economy.maxDebtGdp) return false;
-    if (event.requirements?.consensus?.minGeneral && conditions && (conditions.minConsensus || 0) < event.requirements.consensus.minGeneral) return false;
-    if (event.requirements?.tech?.minLevel && conditions && conditions.techLevel) {
-      const levels = ['launchers', 'satellites', 'stations', 'lunar', 'mars'];
-      const minIdx = levels.indexOf(event.requirements.tech.minLevel);
-      const curIdx = levels.indexOf(conditions.techLevel);
+const TECH_LEVELS = ['launchers', 'satellites', 'stations', 'lunar', 'mars'];
+
+export function filterEligibleEvents(
+  turnNumber: number,
+  conditions?: EventConditions
+): GameEventData[] {
+  return GAME_EVENTS.filter(event => {
+    if (event.requirements?.minTurn && turnNumber < event.requirements.minTurn) {
+      return false;
+    }
+    if (event.requirements?.economy?.minGdp && conditions) {
+      if ((conditions.minGdp || 0) < event.requirements.economy.minGdp) return false;
+    }
+    if (event.requirements?.economy?.maxDebtGdp && conditions) {
+      if ((conditions.maxDebtGdp || 0) > event.requirements.economy.maxDebtGdp) return false;
+    }
+    if (event.requirements?.consensus?.minGeneral && conditions) {
+      if ((conditions.minConsensus || 0) < event.requirements.consensus.minGeneral) return false;
+    }
+    if (event.requirements?.tech?.minLevel && conditions?.techLevel) {
+      const minIdx = TECH_LEVELS.indexOf(event.requirements.tech.minLevel);
+      const curIdx = TECH_LEVELS.indexOf(conditions.techLevel);
       if (curIdx < minIdx) return false;
     }
     return true;
   });
+}
+
+export function getRandomEvent(turnNumber: number, conditions?: EventConditions): GameEventData | null {
+  const eligible = filterEligibleEvents(turnNumber, conditions);
 
   if (eligible.length === 0) return null;
 
