@@ -40,7 +40,7 @@ interface GameStore {
   removeAction: (index: number) => void;
   clearActions: () => void;
 
-  resolveTurn: () => Promise<TurnResult>;
+  resolveTurn: () => Promise<TurnResult | { success: false; error: string }>;
 
   checkWinLose: (turn: GameTurn) => 'win' | 'lose' | null;
 

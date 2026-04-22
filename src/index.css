@@ -70,3 +70,7 @@ input, select, button {
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}

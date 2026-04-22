@@ -1,3 +1,4 @@
+import type { AIPersonality } from './ai/types';
 export type ChoiceCategory = 'economia' | 'militare' | 'politica' | 'diplomazia' | 'tecnologia' | 'cultura';
 export type ChoiceSubcategory = 
   | 'agricoltura' | 'industria' | 'commercio' | 'finanza' | 'risorse' | 'lavoro'
@@ -253,7 +254,7 @@ export type Resources = Nation['resources'];
 
 export interface GameNation extends Nation {
   isPlayer?: boolean;
-  aiPersonality?: string;
+  aiPersonality?: AIPersonality;
   ideology?: string;
   economy?: Partial<Economy>;
   consensus?: Partial<Consensus>;

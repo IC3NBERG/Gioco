@@ -1,6 +1,7 @@
 import { useGameStore } from '../store/gameStore';
 import { generateAITurn, type AIContext } from '../ai/turnSimulator';
 import type { GameNation } from '../types';
+import type { AIPersonality } from '../ai/types';
 
 export interface AIRoundResult {
   processed: string[];
@@ -27,7 +28,7 @@ export async function executeAIRound(
     try {
       const aiContext: AIContext = {
         nationId: nation.id,
-        personality: nation.aiPersonality || 'balanced',
+        personality: nation.aiPersonality || 'pragmatic',
         ideology: nation.ideology || 'neutral',
         economy: {
           gdp: nation.economy?.gdp || 1000,

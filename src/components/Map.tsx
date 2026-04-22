@@ -48,7 +48,8 @@ const NationMarker: React.FC<NationMarkerProps> = ({
       onMouseEnter={() => onHover(nation)}
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
-      style={{ cursor: 'pointer' }}
+      style={{}}
+      className="cursor-pointer"
     >
       <circle
         r={markerSize}
