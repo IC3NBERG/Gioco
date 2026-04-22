@@ -57,7 +57,12 @@ CREATE TABLE game_turns (
 
 -- Indici per performance
 CREATE INDEX idx_turns_nation ON game_turns(nation_id, turn_number DESC);
-CREATE INDEX idx_turns_latest ON game_turns(nation_id) WHERE turn_number = (SELECT MAX(turn_number) FROM game_turns WHERE nation_id = game_turns.nation_id);
+
+-- View per ottenere l'ultimo turno di ogni nazione
+CREATE VIEW latest_turns AS
+SELECT nation_id, MAX(turn_number) as latest_turn_number
+FROM game_turns
+GROUP BY nation_id;
 
 -- =====================================================
 -- TABELLA: relations
