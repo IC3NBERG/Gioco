@@ -1,4 +1,4 @@
-import { calculateAISelection, type AITurnResult, type AIContext } from '../ai/turnSimulator';
+import { generateAITurn, type AITurnResult, type AIContext } from '../ai/turnSimulator';
 import { useGameStore } from '../store/gameStore';
 import type { GameNation } from '../types';
 
@@ -38,7 +38,7 @@ export async function runAIRound(currentTurn: number, nations: GameNation[]): Pr
     }
     
     try {
-      const aiResult = calculateAISelection(aiContext);
+      const aiResult = generateAITurn(aiContext, nations.map(n => n.id).filter(id => id !== nation.id));
       results.push({
         nationId: nation.id,
         actions: aiResult.actions,

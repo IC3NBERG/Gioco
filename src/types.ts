@@ -100,6 +100,9 @@ export interface RegionType {
     territory?: number;
     stability?: number;
     movement?: number;
+    steel?: number;
+    oil?: number;
+    morale?: number;
   };
   weakness: {
     economy?: number;
@@ -116,6 +119,8 @@ export interface RegionType {
     environment?: number;
     health?: number;
     land?: number;
+    corruption?: number;
+    conservative?: number;
   };
   expansionPotential: string;
   difficulty: 'facile' | 'media' | 'difficile';
@@ -150,6 +155,7 @@ export interface IdeologyType {
     independence?: number;
     selfReliance?: number;
     reputation?: number;
+    prestige?: number;
   };
   compatibleFactions: string[];
   color: string;
@@ -191,6 +197,9 @@ export interface FocusType {
     expansion?: number;
     economy?: number;
     earth?: number;
+    aggression?: number;
+    autarky?: number;
+    trade?: number;
   };
   unlockedChoices: string[];
 }
@@ -250,6 +259,8 @@ export interface GameNation extends Nation {
   consensus?: Partial<Consensus>;
   tech?: Record<string, TechProgress>;
   relations?: Array<{ nationId: string; value: number }>;
+  military?: { size?: number; quality?: number };
+  code?: string;
 }
 
 export const countryColors: Record<string, string> = {};

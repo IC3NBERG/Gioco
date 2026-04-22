@@ -85,7 +85,7 @@ const App: React.FC = () => {
   const [executingChoice, setExecutingChoice] = useState(false);
   const [turnNumber, setTurnNumber] = useState(1);
   const [victoryState, setVictoryState] = useState<{ hasWon: boolean; hasLost: boolean; reason?: string } | null>(null);
-  const [paRemaining, setPaRemaining] = useState(GAME_CONFIG.PA_PER_TURN);
+  const [paRemaining, setPaRemaining] = useState<number>(GAME_CONFIG.PA_PER_TURN);
 
   const nations = NATIONS_LIST;
 
@@ -117,7 +117,7 @@ const App: React.FC = () => {
       
       if (result.success) {
         console.log('Azione eseguita:', result);
-        setPaRemaining((prev: number) => prev - choice.cost.pa);
+        setPaRemaining(prev => prev - choice.cost.pa);
         await loadEvents();
         
         if (result.winLose) {

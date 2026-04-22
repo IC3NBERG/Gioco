@@ -1,5 +1,5 @@
 import { useGameStore } from '../store/gameStore';
-import { calculateAISelection, type AIContext } from '../ai/turnSimulator';
+import { generateAITurn, type AIContext } from '../ai/turnSimulator';
 import type { GameNation } from '../types';
 
 export interface AIRoundResult {
@@ -45,7 +45,7 @@ export async function executeAIRound(
         aiContext.relations[rel.nationId] = rel.value;
       }
 
-      const aiResult = calculateAISelection(aiContext);
+      const aiResult = generateAITurn(aiContext, nations.map(n => n.id).filter(id => id !== nation.id));
 
       if (aiResult.actions.length > 0) {
         const { data, error } = await supabase.functions.invoke('resolve-turn', {

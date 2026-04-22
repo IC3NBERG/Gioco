@@ -6,7 +6,7 @@ import type {
   Relation, 
   GameEventDB, 
   ActionQueueItem,
-  ResolveTurnResponse,
+  TurnResult,
   Economy,
   Consensus,
   Faction,
@@ -40,7 +40,7 @@ interface GameStore {
   removeAction: (index: number) => void;
   clearActions: () => void;
 
-  resolveTurn: () => Promise<ResolveTurnResponse>;
+  resolveTurn: () => Promise<TurnResult>;
 
   checkWinLose: (turn: GameTurn) => 'win' | 'lose' | null;
 
@@ -238,7 +238,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       );
 
-      const result: ResolveTurnResponse = await response.json();
+      const result: TurnResult = await response.json();
 
       if (!result.success) {
         set({ isLoading: false, error: result.error || 'Failed to resolve turn' });
