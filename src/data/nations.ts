@@ -1,4 +1,4 @@
-import type { Nation, Position, TechTree, Leader, Resources } from '../types';
+import type { Nation, Position, Leader } from '../types';
 
 export const NATIONS_DATA: (Nation & { position: Position })[] = [
   { id: 'afghanistan', name: 'Afghanistan', color: '#FF6B6B', flag_emoji: '🇦🇫', position: { lat: 33.9391, lng: 67.71 }, resources: { money: 500, oil: 10, steel: 5, food: 20 }, leader: { name: 'Hibatullah Akhundzada', personality: 'Aggressive', ideology: 'Nationalist' }, start_relations: { pakistan: -10, iran: 0, usa: -30, cina: 10 }, tech_tree: { launchers: { level: 0, progress: 0 }, satellites: { level: 0, progress: 0 }, stations: { level: 0, progress: 0 }, lunar: { level: 0, progress: 0 }, mars: { level: 0, progress: 0 } },
