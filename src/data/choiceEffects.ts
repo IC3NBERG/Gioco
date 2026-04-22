@@ -289,7 +289,6 @@ export const CHOICE_EFFECTS: ChoiceEffectMap = {
   annessione: { militaryDelta: 10, gdpDelta: 3, cost: 35, risk: 0.3 },
   client_state: { relationDelta: 20, cost: 45, risk: 0.2 },
   trattato: { relationDelta: 40, stabilityDelta: 10, cost: 40, risk: 0.15 },
-  alleanza_difensiva: { militaryDelta: 10, relationDelta: 30, cost: 25, risk: 0.15 },
   guerrra_fredda: { militaryDelta: 15, relationDelta: -20, cost: 25, risk: 0.25 },
   neutralita: { militaryDelta: 5, cost: 20, risk: 0.2 },
   intervento: { militaryDelta: 20, cost: 60, risk: 0.25 },

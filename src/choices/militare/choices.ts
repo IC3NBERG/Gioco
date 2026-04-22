@@ -1302,6 +1302,322 @@ export const MILITARY_CHOICES: Choice[] = [
     ],
     requirements: { diplomacy: 25 },
     risk: { type: 'rejection', probability: 0.2 }
+  },
+
+  // SPIONAGGIO - Gestione Rete (Nuove)
+  {
+    id: 'spy_network_build',
+    name: 'Costruisci Rete di Spionaggio',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Crea una rete di agenti in una nazione target',
+    cost: { pa: 2, resources: { money: 50 } },
+    effects: [
+      { type: 'immediate', target: 'spy_network', value: 20, duration: 15 },
+      { type: 'immediate', target: 'intelligence', value: 15, duration: 10 }
+    ],
+    unlocks: ['spy_network'],
+    risk: { type: 'detection', probability: 0.25 }
+  },
+  {
+    id: 'spy_operation_assassin',
+    name: 'Operazione Assassinio',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Elimina un target di alto valore',
+    cost: { pa: 3, resources: { money: 100 } },
+    effects: [
+      { type: 'immediate', target: 'elimination', value: 50, duration: 1 },
+      { type: 'delayed', target: 'retaliation', value: 30, duration: 10 }
+    ],
+    requirements: { spy_network: 2, special_ops: 30 },
+    unlocks: ['assassination'],
+    risk: { type: 'failure', probability: 0.4 }
+  },
+  {
+    id: 'spy_operation_kidnap',
+    name: 'Rapimento Scienziato',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Rappodisci uno scienziato nemico',
+    cost: { pa: 3, resources: { money: 80 } },
+    effects: [
+      { type: 'immediate', target: 'kidnapping', value: 40, duration: 5 },
+      { type: 'delayed', target: 'tech_advancement', value: 25, duration: 15 }
+    ],
+    requirements: { spy_network: 2, intelligence: 25 },
+    unlocks: ['kidnapping'],
+    risk: { type: 'capture', probability: 0.3 }
+  },
+  {
+    id: 'spy_tech_theft',
+    name: 'Furto Tecnologico',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Rubla segreti tecnologici',
+    cost: { pa: 2, resources: { money: 70 } },
+    effects: [
+      { type: 'immediate', target: 'tech_theft', value: 35, duration: 10 },
+      { type: 'delayed', target: 'technology', value: 15, duration: 15 }
+    ],
+    requirements: { spy_network: 1, cyber_capability: 20 },
+    unlocks: ['tech_theft'],
+    risk: { type: 'attribution', probability: 0.25 }
+  },
+  {
+    id: 'spy_industrial_sabotage',
+    name: 'Sabotaggio Industriale',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Guasta infrastrutture industriali nemiche',
+    cost: { pa: 2, resources: { money: 60 } },
+    effects: [
+      { type: 'immediate', target: 'sabotage', value: 30, duration: 8 },
+      { type: 'delayed', target: 'production', value: -20, duration: 15 }
+    ],
+    requirements: { spy_network: 1, special_ops: 20 },
+    unlocks: ['industrial_sabotage'],
+    risk: { type: 'discovery', probability: 0.25 }
+  },
+  {
+    id: 'spy_coup_prep',
+    name: 'Preparazione Colpo di Stato',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Prepara un colpo di stato nel paese nemico',
+    cost: { pa: 3, resources: { money: 120 } },
+    effects: [
+      { type: 'immediate', target: 'coup_prep', value: 25, duration: 20 },
+      { type: 'delayed', target: 'regime_change', value: 30, duration: 25 }
+    ],
+    requirements: { spy_network: 3, diplomacy: 30 },
+    unlocks: ['coup_operation'],
+    risk: { type: 'exposure', probability: 0.4 }
+  },
+  {
+    id: 'double_agent_insert',
+    name: 'Inserisci Agente Duplice',
+    category: 'militare',
+    subcategory: 'spionaggio',
+    description: 'Metti un agente nella rete nemica',
+    cost: { pa: 2, resources: { money: 55 } },
+    effects: [
+      { type: 'immediate', target: 'double_agent', value: 30, duration: 20 },
+      { type: 'delayed', target: 'counter_intel', value: 20, duration: 15 }
+    ],
+    requirements: { intelligence: 30 },
+    unlocks: ['double_agent_ops'],
+    risk: { type: 'blow_cover', probability: 0.3 }
+  },
+
+  // DIFESA - Controspionaggio e Sicurezza (Nuove)
+  {
+    id: 'counter_spy_cleanse',
+    name: 'Pulizia Interna',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Rimuovi spie nemiche dalla nazione',
+    cost: { pa: 2, resources: { money: 40 } },
+    effects: [
+      { type: 'immediate', target: 'counter_spy', value: 25, duration: 15 },
+      { type: 'immediate', target: 'security', value: 15, duration: 10 }
+    ],
+    requirements: { intelligence: 20 },
+    unlocks: ['counter_intel'],
+    risk: { type: 'innocent', probability: 0.15 }
+  },
+  {
+    id: 'counter_intel_network',
+    name: 'Rete Controspionaggio',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Crea rete per individuare spie',
+    cost: { pa: 2, resources: { money: 50 } },
+    effects: [
+      { type: 'immediate', target: 'counter_intel_network', value: 30, duration: 20 },
+      { type: 'delayed', target: 'detection', value: 20, duration: 15 }
+    ],
+    unlocks: ['counter_network'],
+    risk: { type: 'infiltration', probability: 0.2 }
+  },
+  {
+    id: 'security_personnel_screening',
+    name: 'Screening Personale',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Ctrlodia accuratamente i dipendenti',
+    cost: { pa: 1, resources: { money: 25 } },
+    effects: [
+      { type: 'immediate', target: 'personnel_security', value: 25, duration: 15 },
+      { type: 'delayed', target: 'insider_threat', value: -15, duration: 10 }
+    ],
+    requirements: { intelligence: 15 },
+    unlocks: ['personnel_screen'],
+    risk: { type: 'false_positive', probability: 0.1 }
+  },
+  {
+    id: 'encryption_upgrade',
+    name: 'Aggiornamento Crittografia',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Migliora seguridadza delle comunicazioni',
+    cost: { pa: 2, resources: { money: 45 } },
+    effects: [
+      { type: 'immediate', target: 'encryption', value: 30, duration: 20 },
+      { type: 'delayed', target: 'hacking_risk', value: -20, duration: 15 }
+    ],
+    requirements: { technology: 35 },
+    unlocks: ['crypto_adv'],
+    risk: { type: 'hacking', probability: 0.1 }
+  },
+  {
+    id: 'security_chain_internal',
+    name: 'Catena di Sicurezza Interna',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Crea livelli multipli di sicurezza',
+    cost: { pa: 3, resources: { money: 80 } },
+    effects: [
+      { type: 'immediate', target: 'security_chain', value: 35, duration: 25 },
+      { type: 'delayed', target: 'defense_depth', value: 25, duration: 20 }
+    ],
+    requirements: { intelligence: 30 },
+    unlocks: ['defense_in_depth'],
+    risk: { type: 'insider', probability: 0.15 }
+  },
+  {
+    id: 'radar_network_expand',
+    name: 'Espandi Rete Radar',
+    category: 'militare',
+    subcategory: 'difesa',
+    description: 'Aumenta la sorveglianza aerea',
+    cost: { pa: 2, resources: { money: 55 } },
+    effects: [
+      { type: 'immediate', target: 'detection', value: 30, duration: 20 },
+      { type: 'immediate', target: 'early_warning', value: 25, duration: 15 }
+    ],
+    requirements: { technology: 30 },
+    unlocks: ['extended_radar'],
+    risk: { type: 'jamming', probability: 0.15 }
+  },
+
+  // GUERRA FREDDA - Azioni Specifiche (Nuove)
+  {
+    id: 'coldwar_escalate_provoke',
+    name: 'Provocazione Militare',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Esercitazioni al confine',
+    cost: { pa: 1, resources: { money: 20 } },
+    effects: [
+      { type: 'immediate', target: 'tension', value: 15, duration: 10 },
+      { type: 'delayed', target: 'military_presence', value: 10, duration: 10 }
+    ],
+    unlocks: ['provocation'],
+    risk: { type: 'incident', probability: 0.2 }
+  },
+  {
+    id: 'coldwar_support_rebels',
+    name: 'Supporto Ribelli Clandestino',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Arma segretamente gruppi ribelli',
+    cost: { pa: 2, resources: { money: 50 } },
+    effects: [
+      { type: 'immediate', target: 'proxy_war', value: 25, duration: 15 },
+      { type: 'delayed', target: 'tension', value: 20, duration: 15 }
+    ],
+    requirements: { military: 20 },
+    unlocks: ['proxy_support'],
+    risk: { type: 'exposure', probability: 0.3 }
+  },
+  {
+    id: 'coldwar_propaganda',
+    name: 'Propaganda Bellica',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Campagna propagandistica contro nemico',
+    cost: { pa: 1, resources: { money: 15 } },
+    effects: [
+      { type: 'immediate', target: 'propaganda', value: 20, duration: 8 },
+      { type: 'delayed', target: 'enemy_consensus', value: -10, duration: 10 }
+    ],
+    unlocks: ['cold_propaganda'],
+    risk: { type: 'exposure', probability: 0.15 }
+  },
+  {
+    id: 'coldwar_arm_race',
+    name: 'Corsa agli Armamenti',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Aumenta spese militari',
+    cost: { pa: 2, resources: { money: 60 } },
+    effects: [
+      { type: 'immediate', target: 'arms_race', value: 30, duration: 15 },
+      { type: 'delayed', target: 'military', value: 20, duration: 15 }
+    ],
+    requirements: { economy: 30 },
+    unlocks: ['militarization'],
+    risk: { type: 'economic_strain', probability: 0.2 }
+  },
+  {
+    id: 'coldwar_embargo',
+    name: 'Embargo Totale',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Blocca completamente commercio',
+    cost: { pa: 1, resources: { money: 10 } },
+    effects: [
+      { type: 'immediate', target: 'embargo', value: 30, duration: 15 },
+      { type: 'delayed', target: 'economy', value: -15, duration: 15 }
+    ],
+    requirements: { allies: 2 },
+    unlocks: ['total_embargo'],
+    risk: { type: 'coalitionCrack', probability: 0.25 }
+  },
+  {
+    id: 'coldwar_deescalate',
+    name: 'Distensione',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Riduci tensioni con il nemico',
+    cost: { pa: 1, resources: { money: 20 } },
+    effects: [
+      { type: 'immediate', target: 'deescalation', value: -20, duration: 10 },
+      { type: 'delayed', target: 'prestige', value: 10, duration: 10 }
+    ],
+    requirements: { cold_war: 1 },
+    unlocks: ['detente'],
+    risk: { type: 'weakness', probability: 0.1 }
+  },
+  {
+    id: 'coldwar_treaty',
+    name: 'Trattato di Controllo Armi',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Accordi per limitare armamenti',
+    cost: { pa: 2, resources: { money: 30 } },
+    effects: [
+      { type: 'immediate', target: 'arms_treaty', value: -25, duration: 25 },
+      { type: 'immediate', target: 'prestige', value: 20, duration: 0 }
+    ],
+    requirements: { diplomacy: 30 },
+    unlocks: ['arms_control'],
+    risk: { type: 'violation', probability: 0.15 }
+  },
+  {
+    id: 'coldwar_troop_withdraw',
+    name: 'Ritiro Truppe Confine',
+    category: 'militare',
+    subcategory: 'diplomazia_bellica',
+    description: 'Ritira truppe dalla frontiera',
+    cost: { pa: 1, resources: { money: 15 } },
+    effects: [
+      { type: 'immediate', target: 'deescalation', value: -15, duration: 10 },
+      { type: 'delayed', target: 'stability', value: 10, duration: 10 }
+    ],
+    unlocks: ['troop_withdrawal'],
+    risk: { type: 'opportunity', probability: 0.1 }
   }
 ];
 

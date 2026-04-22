@@ -1,5 +1,5 @@
-import { calculateAISelection, type AITurnResult, type AIContext } from './turnSimulator';
-import { supabase } from '../lib/supabase';
+import { calculateAISelection, type AITurnResult, type AIContext } from '../ai/turnSimulator';
+import { useGameStore } from '../store/gameStore';
 import type { GameNation } from '../types';
 
 export interface AIRoundResult {
@@ -64,6 +64,11 @@ export async function processAITurns(
   nationIds: string[],
   turnNumber: number
 ): Promise<{ success: boolean; processed: string[]; errors: string[] }> {
+  const supabase = useGameStore.getState().supabase;
+  if (!supabase) {
+    return { success: false, processed: [], errors: ['Supabase non configurato'] };
+  }
+  
   const processed: string[] = [];
   const errors: string[] = [];
   

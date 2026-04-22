@@ -5,7 +5,7 @@ import type { GameNation } from '../types';
 export interface AIRoundResult {
   processed: string[];
   errors: string[];
-  events: number;
+  eventsCreated: number;
 }
 
 export async function executeAIRound(
@@ -83,6 +83,11 @@ export async function runFullTurn(
   aiResult: AIRoundResult;
   newTurn: number;
 }> {
+  const supabase = useGameStore.getState().supabase;
+  if (!supabase) {
+    return { playerSuccess: false, aiResult: { processed: [], errors: ['Supabase non configurato'], eventsCreated: 0 }, newTurn: currentTurn + 1 };
+  }
+  
   let playerSuccess = false;
   let playerResult;
 

@@ -107,6 +107,7 @@ export interface AIPreferenceWeights {
   riskTolerance: number;
   longTermVsShortTerm: number;
   individualVsCollective: number;
+  honor?: number;
 }
 
 export interface NationRelations {

@@ -451,7 +451,7 @@ export const TECHNOLOGY_CHOICES: Choice[] = [
   },
   {
     id: 'industria_12',
-   _name: 'Additive Manufacturing',
+    name: 'Additive Manufacturing',
     category: 'tecnologia',
     subcategory: 'industrializzazione',
     description: 'Produzione additiva',
@@ -761,7 +761,6 @@ export const TECHNOLOGY_CHOICES: Choice[] = [
   },
   {
     id: 'spazio_19',
-    name: 'Generator',
     name: 'Generatore Terra',
     category: 'tecnologia',
     subcategory: 'spazio',

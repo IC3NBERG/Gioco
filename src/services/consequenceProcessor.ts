@@ -1,4 +1,4 @@
-import type { GameNation, GameTurn } from '../../../types';
+import type { GameNation, GameTurn } from '../../types';
 
 export interface Consequence {
   type: 'relation' | 'consensus' | 'gdp' | 'growth' | 'inflation' | 'stability' | 'tech' | 'military';

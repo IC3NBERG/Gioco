@@ -141,7 +141,7 @@ export function simulatePlayerResponse(
   else if (relation >= -50) acceptScore -= 0.3;
   else acceptScore -= 0.5;
 
-  const personalityMatch = senderBehavior.personalityTraits || {};
+  const personalityMatch: { patience?: number; honor?: number; greed?: number; ambition?: number; caution?: number; pride?: number } = senderBehavior.personalityTraits || {};
   acceptScore += (personalityMatch.patience || 50) / 200;
 
   if (action.category === 'diplomazia' && relation < 0) {

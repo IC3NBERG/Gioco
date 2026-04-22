@@ -117,8 +117,8 @@ const App: React.FC = () => {
       
       if (result.success) {
         console.log('Azione eseguita:', result);
-        setPaRemaining(prev => prev - choice.cost.pa);
-        await loadEvents(currentNationId);
+        setPaRemaining((prev: number) => prev - choice.cost.pa);
+        await loadEvents();
         
         if (result.winLose) {
           setVictoryState({ 
@@ -154,7 +154,7 @@ const App: React.FC = () => {
       
       setTurnNumber(result.newTurn);
       setPaRemaining(GAME_CONFIG.PA_PER_TURN);
-      await loadEvents(currentNationId);
+      await loadEvents();
       
       const victory = await checkVictory(currentNationId, turnNumber);
       if (victory.hasWon || victory.hasLost) {

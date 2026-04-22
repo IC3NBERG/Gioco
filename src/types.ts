@@ -240,6 +240,20 @@ export interface Nation {
   position?: Position;
 }
 
+export type Resources = Nation['resources'];
+
+export interface GameNation extends Nation {
+  isPlayer?: boolean;
+  aiPersonality?: string;
+  ideology?: string;
+  economy?: Partial<Economy>;
+  consensus?: Partial<Consensus>;
+  tech?: Record<string, TechProgress>;
+  relations?: Array<{ nationId: string; value: number }>;
+}
+
+export const countryColors: Record<string, string> = {};
+
 export interface Economy {
   gdp: number;
   growth: number;
@@ -339,18 +353,27 @@ export interface DashboardStats {
   consensus: number;
   unemployment: number;
   reserves: number;
+  debtVariant?: 'danger' | 'warning' | 'normal';
 }
 
-export interface ResolveTurnResponse {
+export interface TurnResult {
   success: boolean;
-  newTurn?: GameTurn;
-  events?: Array<{
+  newTurn?: {
+    turn_id: number;
+    nation_id: string;
+    turn_number: number;
+    pa_remaining: number;
+    economy: Record<string, number>;
+    consensus: Record<string, number>;
+    rng_seed: string;
+  };
+  events: Array<{
     type: string;
     title: string;
     description: string;
     severity: string;
   }>;
-  warnings?: string[];
+  warnings: string[];
   winLose?: 'win' | 'lose';
   error?: string;
 }
@@ -423,4 +446,112 @@ export interface GameState {
   events: GameEvent[];
   nationRelations: Record<string, number>;
   victoryCondition: VictoryCondition;
+}
+
+export type SpySpecialization = 'hack' | 'assassin' | 'sabotage' | 'diplomat' | 'double_agent' | 'infiltrator';
+export type SpyStatus = 'active' | 'inactive' | 'captured' | 'killed' | 'missing';
+
+export interface SpyAgent {
+  id: string;
+  name: string;
+  specialization: SpySpecialization;
+  level: number;
+  status: SpyStatus;
+  location: string;
+  experience: number;
+  missions_completed: number;
+  cover_blow: number;
+}
+
+export type SpyOperationType = 
+  | 'reconnaissance' 
+  | 'assassination' 
+  | 'sabotage' 
+  | 'theft' 
+  | 'kidnapping' 
+  | 'coup' 
+  | 'disinformation'
+  | 'propaganda'
+  | 'bribery'
+  | 'double_agent';
+
+export type SpyOperationStatus = 'planning' | 'active' | 'completed' | 'failed' | 'discovered';
+
+export interface SpyOperation {
+  id: string;
+  type: SpyOperationType;
+  source_nation: string;
+  target_nation: string;
+  status: SpyOperationStatus;
+  progress: number;
+  risk: number;
+  created_at: number;
+  completed_at?: number;
+  effects: ChoiceEffect[];
+}
+
+export type ColdWarPhase = 'neutral' | 'tension' | 'cold_war' | 'crisis' | 'hot_war';
+
+export interface ColdWarState {
+  nation_a: string;
+  nation_b: string;
+  phase: ColdWarPhase;
+  tension_level: number;
+  provocations: number;
+  proxy_wars_won: number;
+  lastinteraction: number;
+}
+
+export type SpaceQuestType = 
+  | 'asteroid_mining'
+  | 'lunar_base'
+  | 'crew_flight'
+  | 'mars_colony'
+  | 'orbital_station'
+  | 'space_defense'
+  | 'tourism'
+  | 'research'
+  | 'satellite_constellation';
+
+export type SpaceQuestStatus = 'locked' | 'available' | 'in_progress' | 'completed' | 'failed';
+
+export interface SpaceQuest {
+  id: string;
+  name: string;
+  type: SpaceQuestType;
+  description: string;
+  status: SpaceQuestStatus;
+  progress: number;
+  requirements: ChoiceRequirement;
+  rewards: ChoiceEffect[];
+  unlocks: string[];
+}
+
+export type SpaceBranch = 'heavy' | 'light' | 'fast' | 'economy';
+
+export interface SpaceTechTree {
+  launchers: TechProgress;
+  satellites: TechProgress;
+  stations: TechProgress;
+  lunar: TechProgress;
+  mars: TechProgress;
+  heavy_launchers?: TechProgress;
+  light_launchers?: TechProgress;
+  fast_launchers?: TechProgress;
+  economy_launchers?: TechProgress;
+  orbital_mining?: TechProgress;
+  space_defense?: TechProgress;
+  tourism?: TechProgress;
+}
+
+export type SecurityThreat = 'terrorist' | 'insurgent' | 'organized_crime' | 'spy' | 'saboteur';
+export type SecurityLevel = 'low' | 'medium' | 'high' | 'maximum';
+
+export interface NationalSecurity {
+  level: number;
+  intelligence_capability: number;
+  counter_intelligence: number;
+  surveillance: number;
+  encryption: number;
+  active_threats: Record<SecurityThreat, number>;
 }

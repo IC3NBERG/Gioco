@@ -1,4 +1,4 @@
-import { Choice, ChoiceCategory, ChoiceEffect, ChoiceType, RegionType, IdeologyType, FocusType, VictoryCondition, GameEvent, Consequence } from '../../types';
+import { Choice, ChoiceCategory, ChoiceEffect, ChoiceType, RegionType, IdeologyType, FocusType, VictoryCondition, GameEvent, Consequence } from '../types';
 
 export const REGION_TYPES: RegionType[] = [
   {

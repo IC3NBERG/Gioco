@@ -36,15 +36,29 @@ export async function executeTurn(
 ): Promise<TurnResult> {
   const supabase = useGameStore.getState().supabase;
   if (!supabase) {
-    return { success: false, error: 'Supabase non configurato' };
+    return { success: false, error: 'Supabase non configurato', events: [], warnings: [] };
   }
+
+  const { data, error } = await supabase.functions.invoke('resolve-turn', {
+    body: {
+      nation_id: nationId,
+      actions,
+    },
+  });
 
   if (error) {
     console.error('Turn execution error:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message, events: [], warnings: [] };
   }
 
-  return data as TurnResult;
+  return {
+    success: data?.success ?? false,
+    newTurn: data?.newTurn,
+    events: data?.events ?? [],
+    warnings: data?.warnings ?? [],
+    winLose: data?.winLose,
+    error: data?.error,
+  };
 }
 
 export async function executeChoice(
@@ -91,6 +105,11 @@ export async function checkVictory(nationId: string, currentTurn: number): Promi
   hasLost: boolean;
   reason?: string;
 }> {
+  const supabase = useGameStore.getState().supabase;
+  if (!supabase) {
+    return { hasWon: false, hasLost: false };
+  }
+  
   const { data: turns, error } = await supabase
     .from('game_turns')
     .select('*')
