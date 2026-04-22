@@ -12,6 +12,8 @@ import { NATIONS_LIST } from './data/nations';
 import { executeChoice, checkVictory, skipTurn } from './services/turnExecutor';
 import { runFullTurn } from './services/aiExecutor';
 import GAME_CONFIG from './config/gameConfig';
+import { WorldMapPreview } from './design/WorldMapPreview';
+import { DesignDirectionSelector } from './components/DesignDirectionSelector';
 
 const EventFeed: React.FC<{ events: GameEventDB[] }> = ({ events }) => {
   const getSeverityColor = (severity: string) => {
@@ -75,6 +77,8 @@ const App: React.FC = () => {
     isLoading,
     setCurrentNation,
     loadEvents,
+    designDirection,
+    setDesignDirection,
   } = useGameStore();
 
   const [showFeed, setShowFeed] = useState(true);
@@ -86,6 +90,7 @@ const App: React.FC = () => {
   const [turnNumber, setTurnNumber] = useState(1);
   const [victoryState, setVictoryState] = useState<{ hasWon: boolean; hasLost: boolean; reason?: string } | null>(null);
   const [paRemaining, setPaRemaining] = useState<number>(GAME_CONFIG.PA_PER_TURN);
+  const [showDesignPlayground, setShowDesignPlayground] = useState<boolean>(false);
 
   const nations = NATIONS_LIST;
 
@@ -168,7 +173,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div data-theme={designDirection} className="min-h-screen bg-slate-950 text-slate-100">
       <header className="bg-slate-900 border-b border-slate-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
@@ -240,6 +245,14 @@ const App: React.FC = () => {
                 }`}
               >
                 {showFeed ? '📋-' : '📋+'}
+              </button>
+              <button
+                onClick={() => setShowDesignPlayground(!showDesignPlayground)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-slate-700 text-slate-300 hover:bg-slate-600`}
+                aria-label="Design Playground"
+                title="Design Playground"
+              >
+                🎮 Design
               </button>
             </div>
           </div>
@@ -377,6 +390,16 @@ const App: React.FC = () => {
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 h-[600px] overflow-hidden flex flex-col">
                   <h3 className="text-lg font-semibold text-slate-200 mb-4">Eventi</h3>
                   <EventFeed events={events} />
+                </div>
+              </div>
+            )}
+
+            {showDesignPlayground && (
+              <div className="col-span-12 lg:col-span-12">
+                <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 mt-4 flex flex-col gap-4">
+                  <h3 className="text-lg font-semibold text-slate-200 mb-2">Design Playground</h3>
+                  <DesignDirectionSelector />
+                  <WorldMapPreview />
                 </div>
               </div>
             )}

@@ -27,6 +27,7 @@ interface GameStore {
   error: string | null;
   paRemaining: number;
   pendingActions: Array<{ action_type: string; target?: string; params?: Record<string, unknown> }>;
+  designDirection: 'A' | 'B' | 'C';
 
   initSupabase: (url: string, anonKey: string) => void;
   setCurrentNation: (nationId: string) => Promise<void>;
@@ -35,6 +36,7 @@ interface GameStore {
   loadRelations: () => Promise<void>;
   loadEvents: () => Promise<void>;
   loadActionQueue: () => Promise<void>;
+  setDesignDirection: (dir: 'A' | 'B' | 'C') => void;
 
   addAction: (action: { action_type: string; target?: string; params?: Record<string, unknown> }) => boolean;
   removeAction: (index: number) => void;
@@ -61,6 +63,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isLoading: false,
   error: null,
   paRemaining: PA_LIMIT,
+  designDirection: (typeof window !== 'undefined' && window.localStorage.getItem('designDirection') ? (window.localStorage.getItem('designDirection') as 'A'|'B'|'C') : 'A'),
+  // Add a setter to update the design direction globally
+  setDesignDirection: (dir: 'A' | 'B' | 'C') => {
+    if (typeof window !== 'undefined') {
+      try { window.localStorage.setItem('designDirection', dir); } catch {}
+    }
+    set({ designDirection: dir });
+  },
+  designDirection: 'A',
   pendingActions: [],
 
   initSupabase: (url: string, anonKey: string) => {

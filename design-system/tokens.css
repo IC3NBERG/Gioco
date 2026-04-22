@@ -1,0 +1,92 @@
+/* Design tokens exposed via CSS variables for immediate usage in the app */
+:root {
+  --ds-bg: #0a0f1a;
+  --ds-surface: #101522;
+  --ds-surface-2: #141a2b;
+  --ds-text: #e5e7eb;
+  --ds-text-muted: #9ca3af;
+  --ds-primary: #60a5fa;
+  --ds-primary-2: #22d3ee;
+  --ds-accent: #7c3aed;
+  --ds-green: #10b981;
+  --ds-red: #ef4444;
+  --ds-amber: #f59e0b;
+  --ds-shadow: rgba(0,0,0,0.6);
+  --ds-glow: 0 0 12px rgba(96,165,250,0.7);
+
+  --ds-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  --ds-font-xs: 12px;
+  --ds-font-sm: 14px;
+  --ds-font-md: 16px;
+  --ds-font-lg: 18px;
+  --ds-font-xl: 20px;
+  --ds-font-2xl: 24px;
+
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 12px;
+  --ds-radius-lg: 20px;
+
+  --ds-e1: 0 1px 2px rgba(0,0,0,.25);
+  --ds-e2: 0 4px 12px rgba(0,0,0,.4);
+  --ds-e3: 0 8px 24px rgba(0,0,0,.5);
+
+  --ds-step: 240ms;
+}
+
+/* Theme overrides based on data-theme attribute to switch design direction visuals */
+[data-theme="A"] {
+  --ds-primary: #60a5fa; /* blue */
+  --ds-surface: #111827;
+  --ds-bg: #0a0f1a;
+  --ds-text: #e5e7eb;
+}
+[data-theme="B"] {
+  --ds-primary: #f472b6; /* pink */
+  --ds-surface: #111822;
+  --ds-bg: #0b0f14;
+  --ds-text: #e5e7eb;
+}
+[data-theme="C"] {
+  --ds-primary: #93c5fd; /* light blue */
+  --ds-surface: #141b2b;
+  --ds-bg: #0c111b;
+  --ds-text: #e5e7eb;
+}
+/* Lightweight utility helpers that align with the tokens */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--ds-radius-md);
+  border: 0;
+  background: var(--ds-primary);
+  color: #fff;
+  font-family: var(--ds-font-family);
+  font-size: var(--ds-font-md);
+  cursor: pointer;
+  transition: background var(--ds-step), transform var(--ds-step);
+  box-shadow: var(--ds-e1);
+}
+.ds-btn:hover { background: #4fa3fa; transform: translateY(-1px); }
+.ds-btn.secondary { background: #1f2937; color: #e5e7eb; }
+.ds-card {
+  background: var(--ds-surface);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-e2);
+  border: 1px solid rgba(255,255,255,.05);
+}
+
+/* Ensure layout works nicely with existing Tailwind-based UI */
+.ds-hero-gradient {
+  background: linear-gradient(135deg, rgba(96,165,250,.15), rgba(34,211,238,.15));
+}
+
+/* Map world visual tweaks for isometric-ish vibe (subtle) */
+.ds-world-node {
+  width: 14px; height: 14px; border-radius: 50%; display: inline-block;
+  background: var(--ds-primary);
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.3);
+}
+.ds-world-node.active { background: var(--ds-green); }

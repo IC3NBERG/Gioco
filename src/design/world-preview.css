@@ -1,0 +1,14 @@
+.ds-world-map {
+  display: grid;
+  grid-template-columns: repeat(6, 24px);
+  grid-gap: 8px;
+  padding: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.ds-world-node {
+  width: 16px; height: 16px; border-radius: 50%; background: var(--ds-primary);
+  box-shadow: 0 0 0 2px rgba(96,165,250,.25);
+}
+.ds-world-node.active { background: var(--ds-green); }
+.ds-world-map:focus { outline: 2px solid var(--ds-primary); outline-offset: 2px; }

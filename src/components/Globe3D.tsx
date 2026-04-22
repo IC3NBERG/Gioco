@@ -81,21 +81,25 @@ const Earth: React.FC<{
   currentNationId: string | null;
   selectedNationId: string | null;
   onSelectNation: (id: string) => void;
-}> = ({ nations, currentNationId, selectedNationId, onSelectNation }) => {
+  theme: 'A' | 'B' | 'C';
+}> = ({ nations, currentNationId, selectedNationId, onSelectNation, theme }) => {
   const earthRef = useRef<THREE.Mesh>(null);
   const [atmosphereRef, setAtmosphereRef] = useState<THREE.Mesh | null>(null);
 
   const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
 
+  // Palette per theme
+  const earthColorByTheme: { [k in 'A'|'B'|'C']: string } = { A: '#1a365d', B: '#2b1f12', C: '#0b1220' };
+  const atmosByTheme: { [k in 'A'|'B'|'C']: string } = { A: '#3b82f6', B: '#f472b6', C: '#93c5fd' };
   const earthMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: '#1a365d',
+      color: earthColorByTheme[theme],
       roughness: 0.8,
       metalness: 0.1,
-      emissive: '#0d1b2a',
+      emissive: earthColorByTheme[theme],
       emissiveIntensity: 0.1,
     });
-  }, []);
+  }, [theme]);
 
   const atmosphereMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
@@ -110,9 +114,9 @@ const Earth: React.FC<{
         varying vec3 vNormal;
         void main() {
           float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-          gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity;
+          gl_FragColor = vec4(mix(0.2, 1.0, 0.5), 0.6, 1.0, 1.0) * intensity;
         }
-      `,
+        `,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
       transparent: true,
@@ -202,13 +206,22 @@ interface Globe3DProps {
   currentNationId: string | null;
   selectedNationId: string | null;
   onSelectNation: (id: string) => void;
+  theme?: 'A' | 'B' | 'C';
 }
 
 export const Globe3D: React.FC<Globe3DProps> = ({ 
   currentNationId, 
   selectedNationId, 
-  onSelectNation 
+  onSelectNation,
+  theme = 'A'
 }) => {
+  // Theme palettes for the globe and atmosphere based on design direction
+  const themePalette: Record<'A' | 'B' | 'C', { earth: string; atmosphere: string }> = {
+    A: { earth: '#1a365d', atmosphere: '#3b82f6' },
+    B: { earth: '#2b1f12', atmosphere: '#f472b6' },
+    C: { earth: '#0b1220', atmosphere: '#93c5fd' }
+  };
+  const palette = themePalette[theme];
   return (
     <div className="w-full h-full bg-slate-950">
       <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
@@ -219,6 +232,7 @@ export const Globe3D: React.FC<Globe3DProps> = ({
           currentNationId={currentNationId}
           selectedNationId={selectedNationId}
           onSelectNation={onSelectNation}
+          theme={theme}
         />
         <OrbitControls 
           enablePan={false}
