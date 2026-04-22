@@ -1,4 +1,4 @@
-import type { Choice, ChoiceCategory } from '../../types';
+import type { Choice, ChoiceCategory } from '../types';
 
 export { DIPLOMACY_CHOICES } from './diplomazia/choices';
 export { ECONOMY_CHOICES } from './economia/choices';

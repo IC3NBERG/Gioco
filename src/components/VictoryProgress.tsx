@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { GameNation } from '../../types';
+import type { GameNation } from '../types';
 
 interface VictoryProgressProps {
   nations: GameNation[];

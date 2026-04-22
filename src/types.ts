@@ -41,6 +41,7 @@ export interface ChoiceRequirement {
   allies?: number;
   production?: number;
   tourism?: number;
+  [key: string]: any;
 }
 
 export interface Choice {

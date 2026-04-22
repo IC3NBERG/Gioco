@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import type { Choice, ChoiceCategory } from '../../types';
-import { ALL_CHOICES, getChoicesByCategory } from '../../choices';
+import type { Choice, ChoiceCategory } from '../types';
+import { ALL_CHOICES, getChoicesByCategory } from '../choices';
 
 interface ChoiceBrowserProps {
   onSelectChoice: (choice: Choice) => void;
